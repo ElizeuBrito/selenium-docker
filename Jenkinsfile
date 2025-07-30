@@ -12,14 +12,24 @@ pipeline{
 
         stage('Build Image'){
             steps{
-                sh 'docker build -t=157470/selenium:latest .'
+                sh 'docker build -t=157470/selenium .'
             }
         }
 
         stage('Push Image'){
-            steps{
-                sh 'docker push 157470/selenium:latest'
+            environment{
+                DOCKER_HUB = credentials('dockerhub-creds')
             }
+            steps{
+                sh 'echo ${DOCKER_HUB_PSW} | docker login -u ${DOCKER_HUB_USR} --password-stdin'
+                sh 'docker push 157470/selenium'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh "docker logout"
         }
     }
 }
